@@ -106,7 +106,7 @@ class AgentPark(ABC):
 
     @classmethod
     def register(cls, api_list: list):
-        agent_nums = 4
+        agent_nums = ROLE_NUMS
         if len(api_list) < agent_nums:
             api_map = api_list
             for i in range(agent_nums - len(api_list)):
@@ -124,13 +124,10 @@ class AgentPark(ABC):
         output_master = self.master.chat(user_message)
         master_dict = json_extract(output_master)
         print(master_dict)
-        if master_dict["ID"] == "Writer":
-            execute = self.writer
-        elif master_dict["ID"] == "Programmer":
-            execute = self.programmer
 
-        flag = False
+        execute = self.role_map[master_dict["ID"]]
         execute_messages = [{"role": "user", "content": master_dict["task"]}]
+        flag = False
         while flag == False:
             output_execute = execute.chat(execute_messages)
             print(output_execute)
@@ -149,13 +146,10 @@ class AgentPark(ABC):
                 execute_messages = [
                     {
                         "role": "user",
-                        "content": master_dict["task"]
-                        + "\n你的输出为：\n"
-                        + output_execute
-                        + "\n审核员对该输出的审核意见为：\n"
-                        + auditor_dict["opinion"]
-                        + "\n根据审核意见，请重新输出。",
-                    }
+                        "content": "当前的用户需求为：<\n{}\n>\n你的输出为：<\n{}\n>\n审核员对该输出的审核意见为：<\n{}\n>\n请根据需求与审核意见，重新输出。".format(
+                            master_dict["task"], output_execute, auditor_dict["opinion"]
+                        ),
+                    },
                 ]
             elif auditor_dict["result"] == "pass":
                 flag = True
@@ -163,3 +157,4 @@ class AgentPark(ABC):
         print("------------------------------------")
         print("agentpark result: ")
         print(auditor_dict["output"])
+        return auditor_dict["output"]
