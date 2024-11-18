@@ -1,5 +1,3 @@
-import sys
-sys.path.append(".")
 from agentpark.agentbase import AgentPark
 from agentpark.config.model import MODEL_API
 

@@ -25,6 +25,7 @@ class Agent(ABC):
             api_key=model_api["api_key"],
             base_url=model_api["api_base"],
         )
+        self.model_name = model_api["name"]
         self.system_prompt = system_prompt
 
     def chat(self, messages):
@@ -41,6 +42,7 @@ class Agent(ABC):
             api_key=api_info["api_key"],
             base_url=api_info["api_base"],
         )
+        self.model_name = api_info["name"]
 
 
 class AgentMaster(Agent):
